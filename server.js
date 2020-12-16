@@ -1,9 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const passport = require("passport");
+const dotenv = require("dotenv");
+const auth = require('./routes/apis/middleware/verify')
+
+dotenv.config();
 
 const users = require("./routes/apis/users");
+const dashboard = require("./routes/apis/dashboard");
 
 const app = express();
 app.use(
@@ -12,7 +16,8 @@ app.use(
     })
 );
 app.use(bodyParser.json());
-const db = require("./config/keys").mongoURI;
+
+const db = process.env.DB_CONNECT;
 mongoose
     .connect(
         db,
@@ -22,11 +27,12 @@ mongoose
     .catch(err => console.log(err));
 
 // Passport middleware
-app.use(passport.initialize());
+// app.use(passport.initialize());
 // Passport config
-require("./config/passport")(passport);
+// require("./config/passport")(passport);
 // route /api/users/login|register
 app.use("/api/users", users);
+app.use("/api/dashboard", dashboard);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 app.listen(port, () => console.log(`Server up and running on port ${port} !`));
